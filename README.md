@@ -34,19 +34,13 @@ A **login endpoint** was implemented to generate a **token**. This token is used
 
 Follow these steps to set up and run the application:
 
-1. **Set up the database**:
-   - Use the SQL script located in the folder: `db/db-money_movement.sql` as dummy data.
+1. **Git Clone repository**:
 
-2. **Configure the database and environment variables**:
-   - Update the `.env` file with your database credentials and configuration.
+2. **Make sure to have Docker**:
 
-3. **Install dependencies**:
-   ```bash
-   go mod tidy
-
-4. **Run**
+3. **Run**
     ```bash
-   go run main.go
+   docker compose up -d
 
-5. **Import postman collection**
+4. **Import postman collection**
   - Use this postman collection located in folder: `postman_collection/Money Movement DB.postman_collection.json` as api testing.

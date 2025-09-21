@@ -186,6 +186,41 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "All History Transactions",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTg1MTIzODksInVzZXJfaWQiOiJmMzJkODcyNy0xZjJmLTQ0MDUtYWZjYS1jMmRiZTRiYjk0MjAifQ.4qQbtGx-1Z3hxHIEpgrBA13nhi7C4aERfj0aQXPXUFc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{domain}}/transaction/all-history/:userID",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"transaction",
+						"all-history",
+						":userID"
+					],
+					"variable": [
+						{
+							"key": "userID",
+							"value": "f32d8727-1f2f-4405-afca-c2dbe4bb9420"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
