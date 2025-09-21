@@ -1,0 +1,67 @@
+name: Build & Deploy to DigitalOcean Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 3. Terraform Init
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      # 4. Terraform Apply (provision cluster + registry)
+      - name: Terraform Apply
+        working-directory: terraform
+        run: terraform apply -auto-approve -var-file=environments/dev.tfvars
+
+      # 5. Ambil Docker credentials dari Terraform output
+      - name: Get Docker credentials
+        working-directory: terraform
+        run: |
+          echo "🔑 Get Docker credentials from Terraform..."
+          terraform output -raw docker_credentials | base64 -d > $HOME/.docker/config.json
+
+      # 6. Build & Push Docker image ke DigitalOcean Container Registry
+      - name: Build & Push Docker Image
+        run: |
+          REGISTRY=$(terraform -chdir=infra/terraform output -raw registry_endpoint)
+          IMAGE="$REGISTRY/ewallet-app:latest"
+          echo "🚀 Building image: $IMAGE"
+          docker build -t $IMAGE .
+          docker push $IMAGE
+
+      # 7. Ambil kubeconfig dari Terraform output
+      - name: Write kubeconfig
+        working-directory: terraform
+        run: terraform output -raw kubeconfig > kubeconfig
+
+      # 8. Setup kubectl
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: latest
+
+      # 9. Deploy manifest Kubernetes
+      - name: Deploy to Kubernetes
+        run: |
+          echo "📦 Deploying manifests..."
+          kubectl apply -f deploy/k8s/
+          echo "✅ Deployment done."
+        env:
+          KUBECONFIG: ${{ github.workspace }}/infra/terraform/kubeconfig
