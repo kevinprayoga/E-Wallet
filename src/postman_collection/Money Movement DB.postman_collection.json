@@ -1,0 +1,220 @@
+{
+	"info": {
+		"_postman_id": "680d6f1f-7cc7-4335-b705-1433488e7cfe",
+		"name": "Money Movement DB",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31248622",
+		"_collection_link": "https://red-shuttle-184825.postman.co/workspace/kevin~64f787c0-5cf8-4f27-bbe3-6c0caba03da6/collection/31248622-680d6f1f-7cc7-4335-b705-1433488e7cfe?action=share&source=collection_link&creator=31248622"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "kevinp@example.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "mypassword123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{domain}}/login",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TopUp Balance",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mzc2ODE5MDEsInVzZXJfaWQiOiJmMzJkODcyNy0xZjJmLTQ0MDUtYWZjYS1jMmRiZTRiYjk0MjAifQ.bMDpNWesroklHMVndr95aDWcdTTb612CXY3kAON_J4M",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "amount",
+							"value": "500000",
+							"type": "text"
+						},
+						{
+							"key": "source",
+							"value": "bank_transfer",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{domain}}/transaction/topup/:userID",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"transaction",
+						"topup",
+						":userID"
+					],
+					"variable": [
+						{
+							"key": "userID",
+							"value": "f32d8727-1f2f-4405-afca-c2dbe4bb9420"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Withdraw Balance",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mzc2ODE5MDEsInVzZXJfaWQiOiJmMzJkODcyNy0xZjJmLTQ0MDUtYWZjYS1jMmRiZTRiYjk0MjAifQ.bMDpNWesroklHMVndr95aDWcdTTb612CXY3kAON_J4M",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "amount",
+							"value": "100000",
+							"type": "text"
+						},
+						{
+							"key": "pin",
+							"value": "123456",
+							"type": "text"
+						},
+						{
+							"key": "bank_code",
+							"value": "BCA",
+							"type": "text"
+						},
+						{
+							"key": "account_number",
+							"value": "1902300941",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{domain}}/transaction/withdraw/:userID",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"transaction",
+						"withdraw",
+						":userID"
+					],
+					"variable": [
+						{
+							"key": "userID",
+							"value": "f32d8727-1f2f-4405-afca-c2dbe4bb9420"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Pending Transaction",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mzc2ODE5MDEsInVzZXJfaWQiOiJmMzJkODcyNy0xZjJmLTQ0MDUtYWZjYS1jMmRiZTRiYjk0MjAifQ.bMDpNWesroklHMVndr95aDWcdTTb612CXY3kAON_J4M",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "pin",
+							"value": "123456",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{domain}}/transaction/pending",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"transaction",
+						"pending"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "domain",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
