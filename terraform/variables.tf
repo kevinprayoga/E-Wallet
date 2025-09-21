@@ -1,3 +1,9 @@
+variable "DIGITALOCEAN_TOKEN" {
+  description = "Token API DigitalOcean"
+  type        = string
+  sensitive   = true
+}
+
 variable "registry_name" {
   description = "Nama DigitalOcean Container Registry"
   type = string

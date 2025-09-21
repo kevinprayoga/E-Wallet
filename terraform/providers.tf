@@ -1,4 +1,10 @@
 terraform {
+  cloud {
+    organization = "abdinegara-org"
+    workspaces {
+      name = "ewallet-infra"
+    }
+  }
   required_providers {
     digitalocean = {
       source  = "digitalocean/digitalocean"
