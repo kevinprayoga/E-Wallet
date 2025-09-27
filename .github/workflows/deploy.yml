@@ -62,78 +62,12 @@ jobs:
         env:
           KUBECONFIG: ${{ github.workspace }}/terraform/kubeconfig
         run: |
-          echo "📦 Deploying to Kubernetes..."
+          echo "📦 Updating deployment with new image..."
+          REGISTRY=$(terraform -chdir=terraform output -raw registry_endpoint)
+          IMAGE="$REGISTRY/ewallet-app:${{ github.sha }}"
 
-          # --- SYSTEM PREP ---
-          kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-          kubectl apply -k deploy/k8s/resource-tuning
+          # Update image di deployment ewallet-app
+          kubectl set image deployment/ewallet-app ewallet-app=$IMAGE -n default
 
-          # Patch resources for system components
-          kubectl -n kube-system patch ds cilium \
-            --type='json' \
-            -p='[{"op":"add","path":"/spec/template/spec/containers/0/resources","value":{"requests":{"cpu":"100m","memory":"128Mi"},"limits":{"cpu":"200m","memory":"256Mi"}}}]'
-
-          kubectl -n kube-system patch deployment coredns \
-            --type='json' \
-            -p='[{"op":"add","path":"/spec/template/spec/containers/0/resources","value":{"requests":{"cpu":"50m","memory":"70Mi"},"limits":{"cpu":"100m","memory":"150Mi"}}}]'
-
-          # --- BASE DEPLOYMENT ---
-          kubectl apply -f deploy/k8s/base
-          kubectl apply -f deploy/k8s/database
-          kubectl apply -f deploy/k8s/app/ewallet.yml
-
-          # --- MONITORING STACK ---
-          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-          helm repo update
-          helm install prometheus prometheus-community/kube-prometheus-stack \
-            -n monitoring --create-namespace \
-            -f deploy/helm/monitoring/values.yml
-          kubectl apply -f deploy/k8s/monitoring
-
-          # --- INGRESS CONTROLLER ---
-          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-          helm repo update
-          helm install ingress-nginx ingress-nginx/ingress-nginx \
-            --namespace ingress-nginx \
-            --create-namespace \
-            -f deploy/helm/ingress/values.yml
-
-          # --- CERT-MANAGER ---
-          helm repo add jetstack https://charts.jetstack.io
-          helm repo update
-          helm install cert-manager jetstack/cert-manager \
-            --namespace cert-manager \
-            --create-namespace \
-            --version v1.14.4 \
-            --set installCRDs=true
-          kubectl apply -f deploy/k8s/ingress/cluster-issuer.yml
-          kubectl apply -f deploy/k8s/ingress/ingress.yml
-
-          # --- AUTOSCALING (KEDA) ---
-          helm repo add kedacore https://kedacore.github.io/charts
-          helm repo update
-          helm install keda kedacore/keda \
-            --namespace keda --create-namespace \
-            -f deploy/helm/keda/values.yml
-          kubectl apply -f deploy/k8s/autoscaling
-
-          # --- LOGGING STACK (ELK) ---
-          helm repo add elastic https://helm.elastic.co
-          helm repo update
-          helm install elasticsearch elastic/elasticsearch \
-            --namespace logging --create-namespace \
-            -f deploy/helm/elasticsearch/values.yml
-
-          helm install logstash elastic/logstash \
-            --namespace logging \
-            -f deploy/helm/logstash/values.yml
-
-          helm install filebeat elastic/filebeat \
-            --namespace logging \
-            -f deploy/helm/filebeat/values.yml
-
-          helm install kibana elastic/kibana \
-            --namespace logging \
-            -f deploy/helm/kibana/values.yml
-
-          echo "✅ Deployment completed!"
+          # Pastikan rollout sukses
+          kubectl rollout status deployment/ewallet-app -n default
