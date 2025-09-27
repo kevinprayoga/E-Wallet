@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ewallet-cpu-alerts
+  namespace: monitoring
+spec:
+  groups:
+  - name: ewallet-app
+    rules:
+    - alert: EwalletHighCPU
+      expr: |
+        sum by (namespace, deployment) (
+          rate(container_cpu_usage_seconds_total{
+            container!="", image!=""
+          }[5m])
+          * on(pod,namespace) group_left(deployment)
+            kube_pod_owner{owner_kind="ReplicaSet"}
+          * on(deployment,namespace) group_left
+            max without (replica) (
+              label_replace(kube_deployment_labels,"deployment","$1","deployment","(.*)")
+            )
+        )
+        /
+        sum by (namespace, deployment) (
+          kube_pod_container_resource_requests{
+            resource="cpu", unit="core"
+          }
+          * on(pod,namespace) group_left(deployment)
+            kube_pod_owner{owner_kind="ReplicaSet"}
+          * on(deployment,namespace) group_left
+            max without (replica) (
+              label_replace(kube_deployment_labels,"deployment","$1","deployment","(.*)")
+            )
+        ) > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "CPU usage > 80% ({{ $labels.namespace }}/{{ $labels.deployment }})"
+        description: "Average CPU usage exceeds 80% of requested CPU for >5m."

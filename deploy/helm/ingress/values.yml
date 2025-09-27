@@ -1,0 +1,46 @@
+controller:
+  replicaCount: 1
+  service:
+    type: LoadBalancer
+    externalTrafficPolicy: Cluster
+    annotations:
+      service.beta.kubernetes.io/do-loadbalancer-redirect-http-to-https: "true"
+  ingressClass: nginx
+  ingressClassResource:
+    enabled: true
+    name: nginx
+    default: false
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - ingress-nginx
+        topologyKey: "kubernetes.io/hostname"
+  metrics:
+    enabled: true 
+    serviceMonitor:
+      enabled: true
+      namespace: monitoring
+      interval: 30s
+  admissionWebhooks:
+    enabled: true
+    patch:
+      enabled: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 90Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  config:
+    # konfigurasi tambahan Nginx
+    use-forwarded-headers: "true"
+    enable-real-ip: "true"
+    proxy-body-size: "10m"
+    server-tokens: "false"  # hide nginx version for security
+    ssl-redirect: "true" # handle di cert-manager

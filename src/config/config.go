@@ -31,9 +31,13 @@ func InitDB() (*sql.DB, error) {
 	db.SetMaxOpenConns(100)
 	db.SetConnMaxLifetime(time.Second * 1)
 
-	if err := db.Ping(); err != nil {
+	if err := HealthCheck(db); err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
 	return db, nil
+}
+
+func HealthCheck(db *sql.DB) error {
+	return db.Ping()
 }

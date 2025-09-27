@@ -22,7 +22,7 @@ services:
 
   app:
     container_name: ewallet-app
-    image: ewallet-app:1.0
+    image: ewallet-app:2.4
     build: .
     ports:
       - "8080:8080"

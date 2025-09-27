@@ -1,0 +1,44 @@
+grafana:
+  adminPassword: "admin"
+  service:
+    type: ClusterIP
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    serviceMonitorSelectorNilUsesHelmValues: false
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 300m
+      memory: 512Mi
+
+alertmanager:
+  enabled: true
+  service:
+    type: ClusterIP
+  config: |                      # kirim alert ke Slack
+    route:
+      receiver: "slack"
+      group_by: ["alertname","namespace","pod"]
+    receivers:
+    - name: "slack"
+      slack_configs:
+      - api_url: ${SLACK_WEBHOOK_URL}     # inject via env di helm install
+        channel: "#alerts"
+        send_resolved: true
+        title: '{{ .CommonLabels.alertname }}'
+        text: >-
+          *{{ .CommonLabels.severity | upper }}* in *{{ .CommonLabels.namespace }}*
+          {{ range .Alerts -}}
+          • *{{ .Labels.alertname }}* ({{ .Status }}): {{ .Annotations.description }}
+          {{ end }}

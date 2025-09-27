@@ -26,10 +26,15 @@ variable "cluster_name" {
 
 variable "k8s_version" {
   type    = string
-  default = "1.33.1-do.3"
+  default = "1.33.1-do.4"
 }
 
 variable "node_size" {
   description = "Ukuran node worker"
   type        = string
+}
+
+variable "node_count" {
+  description = "Jumlah node worker"
+  type        = number
 }

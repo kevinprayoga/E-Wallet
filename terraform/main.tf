@@ -16,7 +16,7 @@ resource "digitalocean_kubernetes_cluster" "ewallet-cluster" {
   node_pool {
     name       = "worker-node-pool"
     size       = var.node_size
-    node_count = 1
+    node_count = var.node_count
     auto_scale = false
   }
 }

@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"application-wallet/utils"
 
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 type AuthController struct {
@@ -26,7 +26,10 @@ func (a *AuthController) Login(c *gin.Context) {
 	query := `SELECT id, password_hash FROM users WHERE LOWER(email) = LOWER($1)`
 	err := a.DB.QueryRow(query, email).Scan(&userID, &hashedPassword)
 	if err != nil {
-		fmt.Println(err)
+		log.WithFields(log.Fields{
+			"email": email,
+			"error": err.Error(),
+		}).Warn("failed login attempt")
 		c.JSON(http.StatusUnauthorized, utils.Data(http.StatusUnauthorized, []interface{}{}, 0, "Invalid email"))
 		return
 	}
@@ -34,6 +37,10 @@ func (a *AuthController) Login(c *gin.Context) {
 	// Validate password
 	err = utils.ValidateHashedString(hashedPassword, password)
 	if err != nil {
+		log.WithFields(log.Fields{
+			"email": email,
+			"error": err.Error(),
+		}).Warn("failed login attempt due to invalid password")
 		c.JSON(http.StatusUnauthorized, utils.Data(http.StatusUnauthorized, []interface{}{}, 0, "Invalid password"))
 		return
 	}
@@ -41,6 +48,10 @@ func (a *AuthController) Login(c *gin.Context) {
 	// Generate JWT token
 	token, err := utils.GenerateJWT(userID)
 	if err != nil {
+		log.WithFields(log.Fields{
+			"user_id": userID,
+			"error":   err.Error(),
+		}).Error("failed to generate JWT token")
 		c.JSON(http.StatusInternalServerError, utils.Data(http.StatusInternalServerError, []interface{}{}, 0, "Failed to generate token"))
 		return
 	}

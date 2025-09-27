@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ewallet-app
+  namespace: ewallet
+  labels:
+    app: ewallet
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ewallet
+  template:
+    metadata:
+      labels:
+        app: ewallet
+    spec:
+      containers:
+        - name: ewallet-app
+          image: registry.digitalocean.com/ewallet-registry/ewallet-app:2.4
+          imagePullPolicy: Always
+          ports:
+           - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: ewallet-env
+          resources:
+            requests:
+              cpu: 10m
+              memory: 128Mi
+            limits:
+              cpu: 30m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 20
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - ewallet
+                topologyKey: "kubernetes.io/hostname"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ewallet-service
+  namespace: ewallet
+spec:
+  selector:
+    app: ewallet
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8000
+      targetPort: 8080
