@@ -28,9 +28,9 @@
 					]
 				},
 				"url": {
-					"raw": "{{domain}}/login",
+					"raw": "{{prod}}/login",
 					"host": [
-						"{{domain}}"
+						"{{prod}}"
 					],
 					"path": [
 						"login"
@@ -70,9 +70,9 @@
 					]
 				},
 				"url": {
-					"raw": "{{domain}}/transaction/topup/:userID",
+					"raw": "{{prod}}/transaction/topup/:userID",
 					"host": [
-						"{{domain}}"
+						"{{prod}}"
 					],
 					"path": [
 						"transaction",
@@ -130,9 +130,9 @@
 					]
 				},
 				"url": {
-					"raw": "{{domain}}/transaction/withdraw/:userID",
+					"raw": "{{prod}}/transaction/withdraw/:userID",
 					"host": [
-						"{{domain}}"
+						"{{prod}}"
 					],
 					"path": [
 						"transaction",
@@ -175,9 +175,9 @@
 					]
 				},
 				"url": {
-					"raw": "{{domain}}/transaction/pending",
+					"raw": "{{prod}}/transaction/pending",
 					"host": [
-						"{{domain}}"
+						"{{prod}}"
 					],
 					"path": [
 						"transaction",
@@ -195,7 +195,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTg1MTIzODksInVzZXJfaWQiOiJmMzJkODcyNy0xZjJmLTQ0MDUtYWZjYS1jMmRiZTRiYjk0MjAifQ.4qQbtGx-1Z3hxHIEpgrBA13nhi7C4aERfj0aQXPXUFc",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTkwNzYzODUsInVzZXJfaWQiOiJmMzJkODcyNy0xZjJmLTQ0MDUtYWZjYS1jMmRiZTRiYjk0MjAifQ.0D7j2XpXlfEJZYUQsfr0WknRWiuZktx6Z60mh1kYR58",
 							"type": "string"
 						}
 					]
@@ -203,9 +203,9 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{domain}}/transaction/all-history/:userID",
+					"raw": "{{prod}}/transaction/all-history/:userID",
 					"host": [
-						"{{domain}}"
+						"{{prod}}"
 					],
 					"path": [
 						"transaction",
@@ -229,6 +229,7 @@
 			"script": {
 				"type": "text/javascript",
 				"packages": {},
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -239,6 +240,7 @@
 			"script": {
 				"type": "text/javascript",
 				"packages": {},
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -248,8 +250,11 @@
 	"variable": [
 		{
 			"key": "domain",
-			"value": "http://localhost:8080",
-			"type": "string"
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "prod",
+			"value": ""
 		}
 	]
 }

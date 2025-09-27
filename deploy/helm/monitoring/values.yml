@@ -24,21 +24,47 @@ prometheus:
 
 alertmanager:
   enabled: true
+  alertmanagerSpec:
+    replicas: 1
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 2Gi
   service:
     type: ClusterIP
-  config: |                      # kirim alert ke Slack
+  config:
+    global:
+      resolve_timeout: 5m
     route:
       receiver: "slack"
-      group_by: ["alertname","namespace","pod"]
+      group_by: ["alertname", "namespace", "pod"]
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
     receivers:
-    - name: "slack"
-      slack_configs:
-      - api_url: ${SLACK_WEBHOOK_URL}     # inject via env di helm install
-        channel: "#alerts"
-        send_resolved: true
-        title: '{{ .CommonLabels.alertname }}'
-        text: >-
-          *{{ .CommonLabels.severity | upper }}* in *{{ .CommonLabels.namespace }}*
-          {{ range .Alerts -}}
-          • *{{ .Labels.alertname }}* ({{ .Status }}): {{ .Annotations.description }}
-          {{ end }}
+      - name: "slack"
+        slack_configs:
+          - api_url: "https://hooks.slack.com/services/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"
+            channel: "#alertmanager-ewallet-app"
+            send_resolved: true
+            title: >-
+              [{{ .Status }}] {{ .CommonLabels.alertname }} — {{ .CommonLabels.severity }}
+            text: >-
+              {{ range .Alerts }}
+              *🚨 Alert:* {{ .Labels.alertname }}  
+              *📍 Namespace:* {{ if .Labels.namespace }}{{ .Labels.namespace }}{{ else }}N/A{{ end }}  
+              *🧱 Pod:* {{ if .Labels.pod }}{{ .Labels.pod }}{{ else }}N/A{{ end }}  
+              *⚙️ Status:* {{ .Status | toUpper }}  
+              *🔖 Severity:* {{ if .Labels.severity }}{{ .Labels.severity }}{{ else }}N/A{{ end }}  
+              *📝 Description:* {{ if .Annotations.description }}{{ .Annotations.description }}{{ else }}No description provided.{{ end }}  
+              {{ if eq .Status "resolved" }}
+              ✅ *Resolved at:* {{ .EndsAt }}  
+              {{ else }}
+              🕒 *Started at:* {{ .StartsAt }}  
+              {{ end }}
+              ---
+              {{ end }}
+      - name: "null"

@@ -9,32 +9,14 @@ spec:
     rules:
     - alert: EwalletHighCPU
       expr: |
-        sum by (namespace, deployment) (
-          rate(container_cpu_usage_seconds_total{
-            container!="", image!=""
-          }[5m])
-          * on(pod,namespace) group_left(deployment)
-            kube_pod_owner{owner_kind="ReplicaSet"}
-          * on(deployment,namespace) group_left
-            max without (replica) (
-              label_replace(kube_deployment_labels,"deployment","$1","deployment","(.*)")
-            )
-        )
-        /
-        sum by (namespace, deployment) (
-          kube_pod_container_resource_requests{
-            resource="cpu", unit="core"
-          }
-          * on(pod,namespace) group_left(deployment)
-            kube_pod_owner{owner_kind="ReplicaSet"}
-          * on(deployment,namespace) group_left
-            max without (replica) (
-              label_replace(kube_deployment_labels,"deployment","$1","deployment","(.*)")
-            )
+        (
+          sum(rate(container_cpu_usage_seconds_total{namespace="ewallet", container="ewallet-app"}[1m]))
+          /
+          sum(kube_pod_container_resource_requests{namespace="ewallet", container="ewallet-app", resource="cpu", unit="core"})
         ) > 0.8
-      for: 5m
+      for: 1m
       labels:
         severity: warning
       annotations:
-        summary: "CPU usage > 80% ({{ $labels.namespace }}/{{ $labels.deployment }})"
-        description: "Average CPU usage exceeds 80% of requested CPU for >5m."
+        summary: "High CPU usage on ewallet-app"
+        description: "CPU usage > 80% of requested CPU for more than 1 minute."

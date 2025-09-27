@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: test-slack-alert
+  namespace: monitoring
+  labels:
+    release: prometheus  # ini penting!
+spec:
+  groups:
+  - name: test-alert-group
+    rules:
+    - alert: TestSlackAlert
+      expr: vector(1)
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "🚨 Test Alert: Slack Integration"
+        description: "This is a test alert from Alertmanager to verify Slack integration is working."

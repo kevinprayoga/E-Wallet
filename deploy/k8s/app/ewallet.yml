@@ -26,10 +26,10 @@ spec:
                 name: ewallet-env
           resources:
             requests:
-              cpu: 40m
+              cpu: 200m
               memory: 128Mi
             limits:
-              cpu: 80m
+              cpu: 400m
               memory: 256Mi
           readinessProbe:
             httpGet:
