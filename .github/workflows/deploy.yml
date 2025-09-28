@@ -57,17 +57,17 @@ jobs:
         with:
           version: latest
 
-      # 9. Deploy to Kubernetes
-      - name: Deploy App
-        env:
-          KUBECONFIG: ${{ github.workspace }}/terraform/kubeconfig
-        run: |
-          echo "📦 Updating deployment with new image..."
-          REGISTRY=$(terraform -chdir=terraform output -raw registry_endpoint)
-          IMAGE="$REGISTRY/ewallet-app:${{ github.sha }}"
+      # # 9. Deploy to Kubernetes
+      # - name: Deploy App
+      #   env:
+      #     KUBECONFIG: ${{ github.workspace }}/terraform/kubeconfig
+      #   run: |
+      #     echo "📦 Updating deployment with new image..."
+      #     REGISTRY=$(terraform -chdir=terraform output -raw registry_endpoint)
+      #     IMAGE="$REGISTRY/ewallet-app:${{ github.sha }}"
 
-          # Update image di deployment ewallet-app
-          kubectl set image deployment/ewallet-app ewallet-app=$IMAGE -n ewallet
+      #     # Update image di deployment ewallet-app
+      #     kubectl set image deployment/ewallet-app ewallet-app=$IMAGE -n ewallet
 
-          # Pastikan rollout sukses
-          kubectl rollout status deployment/ewallet-app -n ewallet
+      #     # Pastikan rollout sukses
+      #     kubectl rollout status deployment/ewallet-app -n ewallet
